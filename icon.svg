@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="62%">
+      <stop offset="0%" stop-color="#3d200a"/>
+      <stop offset="100%" stop-color="#110802"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe080"/>
+      <stop offset="45%" stop-color="#c9a84c"/>
+      <stop offset="100%" stop-color="#7a5210"/>
+    </linearGradient>
+  </defs>
+  <circle cx="256" cy="256" r="256" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="url(#ring)" stroke-width="14"/>
+  <circle cx="256" cy="256" r="205" fill="none" stroke="#c9a84c" stroke-width="4" opacity="0.4"/>
+  <circle cx="256" cy="18"  r="15" fill="#c9a84c"/>
+  <circle cx="494" cy="256" r="15" fill="#c9a84c"/>
+  <circle cx="256" cy="494" r="15" fill="#c9a84c"/>
+  <circle cx="18"  cy="256" r="15" fill="#c9a84c"/>
+  <polygon points="256,92 338,205 338,318 256,420 174,318 174,205" fill="#1a0d04" stroke="#c9a84c" stroke-width="7"/>
+  <polygon points="256,92 338,205 256,256 174,205"  fill="#f0d060" opacity="0.92"/>
+  <polygon points="256,420 338,318 256,256 174,318" fill="#7a5010" opacity="0.92"/>
+  <polygon points="174,205 256,256 174,318"          fill="#b08828" opacity="0.9"/>
+  <polygon points="338,205 256,256 338,318"          fill="#906818" opacity="0.9"/>
+  <polygon points="256,92 293,170 256,207 219,170"  fill="white"   opacity="0.2"/>
+  <circle cx="256" cy="256" r="13" fill="#ffe080" opacity="0.78"/>
+</svg>

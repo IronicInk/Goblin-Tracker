@@ -1,0 +1,19 @@
+{
+  "name": "MythicalTrack",
+  "short_name": "MythTrack",
+  "description": "Fantasy card game token & goblin tracker",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f0702",
+  "theme_color": "#0f0702",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "utilities"]
+}
