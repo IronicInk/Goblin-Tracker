@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0f0702">
+  <meta name="theme-color" content="#0c0e1a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="MythicalTrack">
@@ -12,36 +12,77 @@
   <link rel="apple-touch-icon" href="icon.svg">
   <title>MythicalTrack</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="app">
-
-  <!-- HEADER -->
-  <header class="app-header">
-    <div class="app-logo">
-      <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="46" height="46" aria-label="MythicalTrack logo">
+<!-- ============================================================
+     SPLASH SCREEN
+     ============================================================ -->
+<div id="splashScreen" class="splash" aria-label="MythicalTrack loading screen">
+  <div class="splash__content">
+    <div class="splash__logo-wrap">
+      <svg class="splash__logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
         <defs>
-          <radialGradient id="logoBg" cx="50%" cy="38%" r="62%">
+          <radialGradient id="splogoBg" cx="50%" cy="38%" r="62%">
             <stop offset="0%" stop-color="#3d200a"/>
             <stop offset="100%" stop-color="#110802"/>
           </radialGradient>
-          <linearGradient id="logoRing" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id="splogoRing" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#ffe080"/>
             <stop offset="45%" stop-color="#c9a84c"/>
             <stop offset="100%" stop-color="#7a5210"/>
           </linearGradient>
         </defs>
-        <circle cx="50" cy="50" r="48" fill="url(#logoBg)"/>
-        <circle cx="50" cy="50" r="46.5" fill="none" stroke="url(#logoRing)" stroke-width="4"/>
+        <circle cx="50" cy="50" r="48" fill="url(#splogoBg)"/>
+        <circle cx="50" cy="50" r="46.5" fill="none" stroke="url(#splogoRing)" stroke-width="4"/>
+        <circle cx="50" cy="50" r="40"   fill="none" stroke="#c9a84c" stroke-width="1.8" opacity="0.4"/>
+        <circle cx="50" cy="3.5"  r="3" fill="#c9a84c"/>
+        <circle cx="96.5" cy="50" r="3" fill="#c9a84c"/>
+        <circle cx="50" cy="96.5" r="3" fill="#c9a84c"/>
+        <circle cx="3.5" cy="50"  r="3" fill="#c9a84c"/>
+        <polygon points="50,18 66,40 66,62 50,82 34,62 34,40" fill="#1a0d04" stroke="url(#splogoRing)" stroke-width="2.5"/>
+        <polygon points="50,18 66,40 50,50 34,40" fill="#f0d060" opacity="0.92"/>
+        <polygon points="50,82 66,62 50,50 34,62" fill="#7a5010" opacity="0.92"/>
+        <polygon points="34,40 50,50 34,62" fill="#b08828" opacity="0.88"/>
+        <polygon points="66,40 50,50 66,62" fill="#906818" opacity="0.88"/>
+        <polygon points="50,18 57,33 50,40 43,33" fill="white" opacity="0.2"/>
+        <circle cx="50" cy="50" r="2.5" fill="#ffe080" opacity="0.75"/>
+      </svg>
+    </div>
+    <h1 class="splash__title">MythicalTrack</h1>
+    <p class="splash__subtitle">Token Tracker</p>
+    <p class="splash__tap">Tap to continue</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     COMMANDER SELECT SCREEN
+     ============================================================ -->
+<div class="screen" id="selectScreen">
+  <header class="app-header">
+    <div class="app-logo">
+      <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="46" height="46" aria-hidden="true">
+        <defs>
+          <radialGradient id="logoBgS" cx="50%" cy="38%" r="62%">
+            <stop offset="0%" stop-color="#3d200a"/>
+            <stop offset="100%" stop-color="#110802"/>
+          </radialGradient>
+          <linearGradient id="logoRingS" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffe080"/>
+            <stop offset="45%" stop-color="#c9a84c"/>
+            <stop offset="100%" stop-color="#7a5210"/>
+          </linearGradient>
+        </defs>
+        <circle cx="50" cy="50" r="48" fill="url(#logoBgS)"/>
+        <circle cx="50" cy="50" r="46.5" fill="none" stroke="url(#logoRingS)" stroke-width="4"/>
         <circle cx="50" cy="50" r="40" fill="none" stroke="#c9a84c" stroke-width="1.8" opacity="0.4"/>
         <circle cx="50" cy="3.5"  r="3" fill="#c9a84c"/>
         <circle cx="96.5" cy="50" r="3" fill="#c9a84c"/>
         <circle cx="50" cy="96.5" r="3" fill="#c9a84c"/>
         <circle cx="3.5" cy="50"  r="3" fill="#c9a84c"/>
-        <polygon points="50,18 66,40 66,62 50,82 34,62 34,40" fill="#1a0d04" stroke="url(#logoRing)" stroke-width="2.5"/>
+        <polygon points="50,18 66,40 66,62 50,82 34,62 34,40" fill="#1a0d04" stroke="url(#logoRingS)" stroke-width="2.5"/>
         <polygon points="50,18 66,40 50,50 34,40" fill="#f0d060" opacity="0.92"/>
         <polygon points="50,82 66,62 50,50 34,62" fill="#7a5010" opacity="0.92"/>
         <polygon points="34,40 50,50 34,62" fill="#b08828" opacity="0.88"/>
@@ -54,81 +95,116 @@
         <span class="app-subtitle">Token Tracker</span>
       </div>
     </div>
-    <button class="btn-reset" id="resetBtn">New Game</button>
   </header>
 
-  <!-- KRENKO / GOBLINS -->
+  <div class="select-body">
+    <div class="select-hero">
+      <h2 class="select-title">Choose Your Commander</h2>
+      <p class="select-sub">Your commander defines how tokens enter play</p>
+    </div>
+    <div class="commander-list" id="commanderGrid" role="list" aria-label="Commander options">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     GAME SCREEN
+     ============================================================ -->
+<div class="screen" id="gameScreen" hidden>
+<div class="app">
+
+  <header class="app-header">
+    <div class="app-header__left">
+      <button class="btn-change-cmd" id="changeCommanderBtn" aria-label="Change commander">‹ Commander</button>
+    </div>
+    <div class="app-header__right">
+      <button class="btn-reset" id="resetBtn" aria-label="Start new game">New Game</button>
+      <button class="btn-hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <!-- Dropdown menu -->
+    <div class="hamburger-menu" id="hamburgerMenu" hidden role="menu">
+      <button class="hamburger-menu__item" id="menuTutorial" role="menuitem">
+        <span class="hamburger-menu__icon">📖</span>
+        Tutorial
+      </button>
+    </div>
+  </header>
+
+  <!-- KRENKO / COMMANDER CARD -->
   <section class="section krenko-section">
     <div class="krenko-card">
 
-      <!-- Card header: name + ability -->
       <div class="krenko-top">
         <div class="krenko-info">
-          <span class="krenko-name">Goblin Mob Boss</span>
-          <span class="krenko-ability">Tap: Create X 1/1 Goblin tokens (X = Goblins you control)</span>
+          <span class="krenko-name" id="commanderName">Goblin Mob Boss</span>
+          <span class="krenko-ability" id="commanderAbility">Tap: Create X 1/1 Goblin tokens (X = Goblins you control)</span>
         </div>
       </div>
 
-      <!-- Total counter -->
       <div class="goblin-total-row">
-        <span class="pool-total-label">Total Goblins</span>
+        <span class="pool-total-label" id="poolTotalLabel">Total Tokens</span>
         <span class="pool-total-val" id="goblinTotal">0</span>
       </div>
 
-      <!-- Ready / Sick pools -->
       <div class="goblin-pools">
         <div class="goblin-pool">
-          <span class="pool-label">⚡ Ready</span>
+          <span class="pool-label">Ready</span>
           <div class="stepper">
-            <button class="stepper-btn" id="readyPlus">+</button>
+            <button class="stepper-btn" id="readyPlus" aria-label="Add ready token">+</button>
             <span class="goblin-count" id="goblinsReady">0</span>
-            <button class="stepper-btn" id="readyMinus">−</button>
+            <button class="stepper-btn" id="readyMinus" aria-label="Remove ready token">−</button>
           </div>
         </div>
         <div class="goblin-pool">
-          <span class="pool-label">💤 Sick</span>
+          <span class="pool-label">Sick</span>
           <div class="stepper">
-            <button class="stepper-btn" id="sickPlus">+</button>
+            <button class="stepper-btn" id="sickPlus" aria-label="Add sick token">+</button>
             <span class="goblin-count" id="goblinsSick">0</span>
-            <button class="stepper-btn" id="sickMinus">−</button>
+            <button class="stepper-btn" id="sickMinus" aria-label="Remove sick token">−</button>
           </div>
         </div>
       </div>
 
-      <!-- Goblin Power / Toughness -->
       <div class="goblin-pt-section">
-        <span class="goblin-pt-title">Goblin Power / Toughness</span>
         <div class="goblin-pt-grid">
           <div class="goblin-pool">
             <span class="pool-label">⚔ Attack</span>
             <div class="stepper">
-              <button class="stepper-btn" id="goblinAtkPlus">+</button>
+              <button class="stepper-btn" id="goblinAtkPlus" aria-label="Increase attack">+</button>
               <span class="goblin-stat-val" id="goblinAtk">1</span>
-              <button class="stepper-btn" id="goblinAtkMinus">−</button>
+              <button class="stepper-btn" id="goblinAtkMinus" aria-label="Decrease attack">−</button>
             </div>
           </div>
           <span class="goblin-pt-sep">/</span>
           <div class="goblin-pool">
             <span class="pool-label">🛡 Defense</span>
             <div class="stepper">
-              <button class="stepper-btn" id="goblinDefPlus">+</button>
+              <button class="stepper-btn" id="goblinDefPlus" aria-label="Increase defense">+</button>
               <span class="goblin-stat-val" id="goblinDef">1</span>
-              <button class="stepper-btn" id="goblinDefMinus">−</button>
+              <button class="stepper-btn" id="goblinDefMinus" aria-label="Decrease defense">−</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Action buttons row -->
       <div class="krenko-actions">
-        <button class="krenko-action-btn krenko-wipe" id="boardWipeBtn">☠ Board Wipe</button>
-        <button class="krenko-action-btn krenko-turn" id="newTurnBtn">↻ New Turn</button>
+        <button class="krenko-action-btn krenko-wipe" id="boardWipeBtn" aria-label="Board wipe, clear all tokens">☠ Board Wipe</button>
+        <button class="krenko-action-btn krenko-turn" id="newTurnBtn" aria-label="New turn, move sick tokens to ready">↻ New Turn</button>
       </div>
 
-      <!-- Tap Krenko -->
-      <button class="tap-btn" id="tapKrenkoBtn">
-        <span class="tap-btn__label">⚡ TAP KRENKO</span>
-        <span class="tap-btn__hint" id="tapHint">add goblins first</span>
+      <button class="tap-btn" id="tapKrenkoBtn" aria-label="Tap commander">
+        <span class="tap-btn__label" id="tapBtnLabel">⚡ TAP COMMANDER</span>
+        <span class="tap-btn__hint" id="tapHint">add tokens first</span>
+      </button>
+
+      <button class="haste-toggle" id="hasteToggle" aria-pressed="false">
+        <span class="haste-toggle__dot"></span>
+        <span class="haste-toggle__label">Haste — tokens enter <strong id="hasteTarget">Sick</strong></span>
       </button>
 
     </div>
@@ -138,33 +214,137 @@
   <section class="section">
     <h2 class="section-title">Tokens</h2>
     <div class="tokens-grid" id="tokensGrid"></div>
-    <button class="btn-add-token" id="addTokenBtn">+ Add Custom Token</button>
+    <button class="btn-add-token" id="addTokenBtn" aria-label="Add a new token">+ Add Token</button>
   </section>
 
-
+</div>
 </div>
 
-<!-- ADD TOKEN MODAL -->
-<div class="modal-overlay" id="addModal">
+<!-- ============================================================
+     INSTALL BANNERS
+     ============================================================ -->
+<div class="install-banner" id="installBanner" hidden role="banner" aria-label="Install app prompt">
+  <div class="install-banner__content">
+    <span class="install-banner__icon">📱</span>
+    <div class="install-banner__text">
+      <strong>Install MythicalTrack</strong>
+      <span>Play offline, anytime</span>
+    </div>
+  </div>
+  <div class="install-banner__actions">
+    <button class="install-banner__btn" id="installBtn">Install</button>
+    <button class="install-banner__dismiss" id="installDismiss" aria-label="Dismiss">✕</button>
+  </div>
+</div>
+
+<div class="install-banner install-banner--ios" id="iosBanner" hidden role="banner">
+  <div class="install-banner__content">
+    <span class="install-banner__icon">📱</span>
+    <div class="install-banner__text">
+      <strong>Install MythicalTrack</strong>
+      <span>Tap <strong>Share</strong> → <strong>Add to Home Screen</strong></span>
+    </div>
+  </div>
+  <button class="install-banner__dismiss" id="iosDismiss" aria-label="Dismiss">✕</button>
+</div>
+
+<!-- ============================================================
+     ONBOARDING MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="onboardModal" role="dialog" aria-modal="true" aria-labelledby="onboardTitle">
+  <div class="modal onboard-modal">
+    <button class="modal__close" id="onboardClose" aria-label="Close tutorial">×</button>
+    <h3 class="modal-title" id="onboardTitle">How It Works</h3>
+    <p class="modal-body">Track your token strategy each turn:</p>
+    <div class="onboard-steps">
+      <div class="onboard-step">
+        <span class="onboard-step-dot" style="background: var(--turquoise)"></span>
+        <div class="onboard-step-text">
+          <strong>Ready</strong> — Tokens that can attack or tap this turn
+        </div>
+      </div>
+      <div class="onboard-step">
+        <span class="onboard-step-dot" style="background: var(--red)"></span>
+        <div class="onboard-step-text">
+          <strong>Sick</strong> — Summoning sickness. Just entered play, can't act yet
+        </div>
+      </div>
+      <div class="onboard-step">
+        <span class="onboard-step-dot" style="background: var(--cmd-color, #f07030)"></span>
+        <div class="onboard-step-text">
+          <strong>Tap Commander</strong> — Creates new tokens based on your commander's ability
+        </div>
+      </div>
+      <div class="onboard-step">
+        <span class="onboard-step-dot" style="background: var(--gold)"></span>
+        <div class="onboard-step-text">
+          <strong>New Turn</strong> — Moves all Sick tokens to Ready so they can fight
+        </div>
+      </div>
+    </div>
+    <button class="btn-modal btn-modal--confirm" id="onboardDone" style="width:100%; margin-top:8px;">Let's Play!</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     CUSTOM COMMANDER MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="customCmdModal" role="dialog" aria-modal="true" aria-labelledby="customCmdTitle">
   <div class="modal">
-    <h3 class="modal-title">Add Custom Token</h3>
-    <input class="modal-input" id="tokenNameInput" type="text" placeholder="Token name (e.g. Zombie)" maxlength="20" autocomplete="off">
+    <h3 class="modal-title" id="customCmdTitle">Custom Commander</h3>
+    <input class="modal-input" id="customCmdName"   type="text" placeholder="Commander name" maxlength="30" autocomplete="off" aria-label="Commander name">
+    <input class="modal-input" id="customTokenName" type="text" placeholder="Token name (e.g. Soldier)" maxlength="20" autocomplete="off" aria-label="Token name" style="margin-top:10px;">
+    <div class="modal-stat-row" style="margin-top:14px;">
+      <div class="modal-stat-group">
+        <label class="modal-stat-label">Tap creates</label>
+        <div class="modal-stat-adj">
+          <button class="modal-stat-btn" id="customTapMinus" aria-label="Decrease tap count">−</button>
+          <span class="modal-stat-val" id="customTapVal">1</span>
+          <button class="modal-stat-btn" id="customTapPlus" aria-label="Increase tap count">+</button>
+        </div>
+      </div>
+      <div class="modal-stat-sep" style="visibility:hidden">/</div>
+      <div class="modal-stat-group" style="visibility:hidden">
+        <label class="modal-stat-label">placeholder</label>
+        <div class="modal-stat-adj"><span class="modal-stat-val">1</span></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-modal--cancel" id="customCmdCancel">Cancel</button>
+      <button class="btn-modal btn-modal--confirm" id="customCmdConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ADD TOKEN MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="addModal" role="dialog" aria-modal="true" aria-labelledby="addModalTitle">
+  <div class="modal">
+    <h3 class="modal-title" id="addModalTitle">Add Token</h3>
+
+    <p class="preset-section-label">Quick Add</p>
+    <div class="preset-token-grid" id="presetTokenGrid"></div>
+
+    <div class="modal-divider"><span>or custom</span></div>
+
+    <input class="modal-input" id="tokenNameInput" type="text" placeholder="Token name (e.g. Zombie)" maxlength="20" autocomplete="off" aria-label="Token name">
     <div class="modal-stat-row">
       <div class="modal-stat-group">
         <label class="modal-stat-label">⚔ Attack</label>
         <div class="modal-stat-adj">
-          <button class="modal-stat-btn" id="modalAtkMinus">−</button>
+          <button class="modal-stat-btn" id="modalAtkMinus" aria-label="Decrease attack">−</button>
           <span class="modal-stat-val" id="modalAtkVal">1</span>
-          <button class="modal-stat-btn" id="modalAtkPlus">+</button>
+          <button class="modal-stat-btn" id="modalAtkPlus" aria-label="Increase attack">+</button>
         </div>
       </div>
       <div class="modal-stat-sep">/</div>
       <div class="modal-stat-group">
         <label class="modal-stat-label">🛡 Defense</label>
         <div class="modal-stat-adj">
-          <button class="modal-stat-btn" id="modalDefMinus">−</button>
+          <button class="modal-stat-btn" id="modalDefMinus" aria-label="Decrease defense">−</button>
           <span class="modal-stat-val" id="modalDefVal">1</span>
-          <button class="modal-stat-btn" id="modalDefPlus">+</button>
+          <button class="modal-stat-btn" id="modalDefPlus" aria-label="Increase defense">+</button>
         </div>
       </div>
     </div>
@@ -175,11 +355,27 @@
   </div>
 </div>
 
-<!-- RESET CONFIRM MODAL -->
-<div class="modal-overlay" id="resetModal">
+<!-- ============================================================
+     BOARD WIPE CONFIRM MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="wipeModal" role="dialog" aria-modal="true" aria-labelledby="wipeModalTitle">
   <div class="modal">
-    <h3 class="modal-title">Start New Game?</h3>
-    <p class="modal-body">This will reset all tokens and history.</p>
+    <h3 class="modal-title" id="wipeModalTitle">Board Wipe?</h3>
+    <p class="modal-body">Removes all tokens from Ready and Sick pools. Token cards are unaffected.</p>
+    <div class="modal-actions">
+      <button class="btn-modal btn-modal--cancel" id="wipeModalCancel">Cancel</button>
+      <button class="btn-modal btn-modal--danger" id="wipeModalConfirm">☠ Wipe Board</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     RESET CONFIRM MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="resetModal" role="dialog" aria-modal="true" aria-labelledby="resetModalTitle">
+  <div class="modal">
+    <h3 class="modal-title" id="resetModalTitle">Start New Game?</h3>
+    <p class="modal-body">This will reset all tokens and return you to commander selection.</p>
     <div class="modal-actions">
       <button class="btn-modal btn-modal--cancel" id="resetModalCancel">Cancel</button>
       <button class="btn-modal btn-modal--danger" id="resetModalConfirm">Reset Everything</button>
