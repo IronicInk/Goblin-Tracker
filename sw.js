@@ -1,10 +1,12 @@
-const CACHE = 'mythicaltrack-v3';
+const CACHE = 'mythicaltrack-v4';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
   './icon.svg',
+  './icon-192.png',
+  './icon-512.png',
   './manifest.json',
   './Gemini_Generated_Image_19vrzs19vrzs19vr.png',
   'https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap',
