@@ -698,46 +698,6 @@ document.getElementById('menuTutorial').addEventListener('click', () => {
 });
 
 /* ============================================================
-   PWA INSTALL PROMPT
-   ============================================================ */
-const INSTALL_DISMISSED_KEY = 'mythicaltrack_install_dismissed';
-let deferredPrompt = null;
-const installBanner = document.getElementById('installBanner');
-
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  if (!localStorage.getItem(INSTALL_DISMISSED_KEY)) installBanner.hidden = false;
-});
-
-document.getElementById('installBtn').addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  installBanner.hidden = true;
-  if (outcome === 'accepted') localStorage.setItem(INSTALL_DISMISSED_KEY, '1');
-  deferredPrompt = null;
-});
-
-document.getElementById('installDismiss').addEventListener('click', () => {
-  installBanner.hidden = true;
-  localStorage.setItem(INSTALL_DISMISSED_KEY, '1');
-});
-
-const isIOS        = /iphone|ipad|ipod/i.test(navigator.userAgent);
-const isStandalone = window.navigator.standalone === true;
-if (isIOS && !isStandalone && !localStorage.getItem(INSTALL_DISMISSED_KEY)) {
-  document.getElementById('iosBanner').hidden = false;
-}
-const iosDismissBtn = document.getElementById('iosDismiss');
-if (iosDismissBtn) {
-  iosDismissBtn.addEventListener('click', () => {
-    document.getElementById('iosBanner').hidden = true;
-    localStorage.setItem(INSTALL_DISMISSED_KEY, '1');
-  });
-}
-
-/* ============================================================
    SPLASH SCREEN
    ============================================================ */
 const splashEl = document.getElementById('splashScreen');
