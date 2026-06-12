@@ -1,6 +1,6 @@
 {
-  "name": "MythicalTrack",
-  "short_name": "MythTrack",
+  "name": "Mythical Tracker",
+  "short_name": "Mythical",
   "description": "Fantasy card game token & goblin tracker",
   "start_url": "/",
   "display": "standalone",
