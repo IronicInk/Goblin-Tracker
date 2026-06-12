@@ -12,6 +12,21 @@
   "lang": "en-US",
   "dir": "ltr",
   "categories": ["games", "utilities"],
+  "prefer_related_applications": false,
+  "screenshots": [
+    {
+      "src": "screenshot1.jpg",
+      "sizes": "1080x2340",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshot2.jpg",
+      "sizes": "1080x2340",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    }
+  ],
   "icons": [
     {
       "src": "icon-192.png",
