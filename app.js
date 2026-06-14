@@ -316,8 +316,11 @@ function renderGoblins() {
   const total = goblinTotal();
   const cmd   = state.commander;
 
+  const hastedDisplay = state.hasteMode
+    ? state.goblinsReady + state.goblinsSick + state.goblinsHasted
+    : state.goblinsHasted;
   document.getElementById('goblinsReady').textContent  = state.goblinsReady;
-  document.getElementById('goblinsHasted').textContent = state.goblinsHasted;
+  document.getElementById('goblinsHasted').textContent = hastedDisplay;
   document.getElementById('goblinsSick').textContent   = state.goblinsSick;
   document.getElementById('goblinTotal').textContent  = total;
   document.getElementById('goblinAtk').textContent    = state.goblinAtk;
@@ -416,8 +419,15 @@ document.getElementById('readyPlus').addEventListener('click', () => {
 });
 document.getElementById('hastedMinus').addEventListener('click', () => {
   haptic(6);
-  if (state.goblinsHasted === 0) return;
-  state.goblinsHasted--;
+  if (state.hasteMode) {
+    if      (state.goblinsHasted > 0) state.goblinsHasted--;
+    else if (state.goblinsSick   > 0) state.goblinsSick--;
+    else if (state.goblinsReady  > 0) state.goblinsReady--;
+    else return;
+  } else {
+    if (state.goblinsHasted === 0) return;
+    state.goblinsHasted--;
+  }
   render();
 });
 document.getElementById('hastedPlus').addEventListener('click', () => {
@@ -508,15 +518,11 @@ hasteToggleBtn.addEventListener('click', () => {
   const wasOn = state.hasteMode;
   state.hasteMode = !state.hasteMode;
   if (wasOn) {
-    // Turning haste OFF — all hasted tokens lose haste, fall back to sick
+    // Turning haste OFF — only newly hasted tokens fall to sick; ready stays ready
     state.goblinsSick  += state.goblinsHasted;
     state.goblinsHasted = 0;
-  } else {
-    // Turning haste ON — merge ready and sick into hasted pool
-    state.goblinsHasted += state.goblinsReady + state.goblinsSick;
-    state.goblinsReady   = 0;
-    state.goblinsSick    = 0;
   }
+  // Turning haste ON — don't move tokens, just change the display
   render();
 });
 
