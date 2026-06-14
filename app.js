@@ -508,9 +508,14 @@ hasteToggleBtn.addEventListener('click', () => {
   const wasOn = state.hasteMode;
   state.hasteMode = !state.hasteMode;
   if (wasOn) {
-    // Turning haste OFF — hasted tokens lose haste, fall back to sick
-    state.goblinsSick += state.goblinsHasted;
+    // Turning haste OFF — all hasted tokens lose haste, fall back to sick
+    state.goblinsSick  += state.goblinsHasted;
     state.goblinsHasted = 0;
+  } else {
+    // Turning haste ON — merge ready and sick into hasted pool
+    state.goblinsHasted += state.goblinsReady + state.goblinsSick;
+    state.goblinsReady   = 0;
+    state.goblinsSick    = 0;
   }
   render();
 });

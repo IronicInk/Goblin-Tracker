@@ -326,12 +326,16 @@ body {
   border-color: rgba(224, 48, 32, 0.3);
 }
 
-/* 3-column grid when haste mode is active */
+/* Haste mode — single full-width hasted pool */
 .goblin-pools--haste {
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr;
+}
+.goblin-pools--haste .goblin-pool--ready,
+.goblin-pools--haste .goblin-pool--sick {
+  display: none;
 }
 
-/* Hasted pool — hidden by default, shown in haste mode */
+/* Hasted pool — hidden by default, shown full-width in haste mode */
 .goblin-pool--hasted {
   display: none;
 }
