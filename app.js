@@ -203,6 +203,8 @@ function loadState() {
         tag:       t.tag       || 'Token',
         ready:     typeof t.ready     === 'number'  ? t.ready     : (t.count || 0),
         sick:      typeof t.sick      === 'number'  ? t.sick      : 0,
+        hasted:    typeof t.hasted    === 'number'  ? t.hasted    : 0,
+        hasteMode: typeof t.hasteMode === 'boolean' ? t.hasteMode : false,
         atk:       typeof t.atk      === 'number'  ? t.atk       : 1,
         def:       typeof t.def      === 'number'  ? t.def       : 1,
         collapsed: typeof t.collapsed === 'boolean' ? t.collapsed : false,
@@ -459,9 +461,11 @@ function renderGoblins() {
 }
 
 function tokenCardHTML(t, idxAttr, removeIdx) {
-  const tagClass  = (t.tag || 'token').toLowerCase();
-  const total     = t.ready + t.sick;
-  const collapsed = t.collapsed || false;
+  const tagClass      = (t.tag || 'token').toLowerCase();
+  const total         = t.ready + t.sick + (t.hasted || 0);
+  const collapsed     = t.collapsed  || false;
+  const hasteMode     = t.hasteMode  || false;
+  const hastedDisplay = hasteMode ? total : (t.hasted || 0);
   return `
     <div class="token-card ${collapsed ? 'token-card--collapsed' : ''}">
       <div class="token-card-header" data-collapse-ci="${removeIdx}">
@@ -477,6 +481,18 @@ function tokenCardHTML(t, idxAttr, removeIdx) {
         <span class="pool-total-label">Total</span>
         <span class="pool-total-val">${total}</span>
       </div>
+      ${hasteMode ? `
+      <div class="goblin-pools goblin-pools--haste">
+        <div class="goblin-pool goblin-pool--hasted">
+          <span class="pool-label">⚡ Hasted</span>
+          <div class="stepper">
+            <button class="stepper-btn" ${idxAttr} data-pool="hasted" data-d="1" aria-label="Add hasted">+</button>
+            <span class="goblin-count">${hastedDisplay}</span>
+            <button class="stepper-btn" ${idxAttr} data-pool="hasted" data-d="-1" aria-label="Remove hasted">−</button>
+          </div>
+        </div>
+      </div>
+      ` : `
       <div class="goblin-pools">
         <div class="goblin-pool">
           <span class="pool-label">Ready</span>
@@ -495,6 +511,7 @@ function tokenCardHTML(t, idxAttr, removeIdx) {
           </div>
         </div>
       </div>
+      `}
       <div class="goblin-pt-section">
         <div class="goblin-pt-grid">
           <div class="goblin-pool">
@@ -516,6 +533,10 @@ function tokenCardHTML(t, idxAttr, removeIdx) {
           </div>
         </div>
       </div>
+      <button class="haste-toggle token-haste-toggle" data-haste-ci="${removeIdx}" aria-pressed="${hasteMode}">
+        <span class="haste-toggle__dot"></span>
+        <span class="haste-toggle__label">Haste — tokens enter <strong>${hasteMode ? '⚡ Hasted' : 'Sick'}</strong></span>
+      </button>
       <div class="token-card-remove">
         <button class="btn-remove" data-ri="${removeIdx}" aria-label="Remove ${t.name} token">× Remove</button>
       </div>
@@ -665,10 +686,11 @@ document.getElementById('newTurnBtn').addEventListener('click', () => {
   state.goblinsReady  += state.goblinsSick + state.goblinsHasted;
   state.goblinsSick    = 0;
   state.goblinsHasted  = 0;
-  // Graduate all token card sick pools too
+  // Graduate all token card sick + hasted pools too
   state.custom.forEach(t => {
-    t.ready += t.sick;
-    t.sick   = 0;
+    t.ready  += t.sick + (t.hasted || 0);
+    t.sick    = 0;
+    t.hasted  = 0;
   });
   render();
 });
@@ -703,12 +725,21 @@ document.getElementById('tapKrenkoBtn').addEventListener('click', () => {
 document.getElementById('tokensGrid').addEventListener('click', e => {
   haptic(6);
 
-  // Ready/Sick pool buttons on token cards
+  // Pool buttons (ready / sick / hasted) on token cards
   const poolBtn = e.target.closest('[data-ci][data-pool][data-d]');
   if (poolBtn) {
     const token = state.custom[+poolBtn.dataset.ci];
     const pool  = poolBtn.dataset.pool;
-    token[pool] = Math.max(0, token[pool] + (+poolBtn.dataset.d));
+    const d     = +poolBtn.dataset.d;
+    if (pool === 'hasted' && d === -1) {
+      // Smart removal: drain hasted first, then sick, then ready
+      if      (token.hasted > 0) token.hasted--;
+      else if (token.sick   > 0) token.sick--;
+      else if (token.ready  > 0) token.ready--;
+      else return;
+    } else {
+      token[pool] = Math.max(0, token[pool] + d);
+    }
     render();
     return;
   }
@@ -729,6 +760,22 @@ document.getElementById('tokensGrid').addEventListener('click', e => {
     saveUndoSnapshot();
     haptic(10);
     state.custom.splice(+rBtn.dataset.ri, 1);
+    render();
+    return;
+  }
+
+  // Per-token haste toggle
+  const hasteBtn = e.target.closest('[data-haste-ci]');
+  if (hasteBtn) {
+    saveUndoSnapshot();
+    haptic(6);
+    const token  = state.custom[+hasteBtn.dataset.hasteCi];
+    const wasOn  = token.hasteMode;
+    token.hasteMode = !wasOn;
+    if (wasOn) {
+      token.sick   += token.hasted;
+      token.hasted  = 0;
+    }
     render();
     return;
   }
@@ -779,7 +826,7 @@ document.getElementById('presetTokenGrid').addEventListener('click', e => {
   const chip = e.target.closest('.preset-chip');
   if (!chip) return;
   haptic(8);
-  state.custom.push({ name: chip.dataset.name, tag: 'Token', ready: 0, sick: 0, atk: +chip.dataset.atk, def: +chip.dataset.def, collapsed: false });
+  state.custom.push({ name: chip.dataset.name, tag: 'Token', ready: 0, sick: 0, hasted: 0, hasteMode: false, atk: +chip.dataset.atk, def: +chip.dataset.def, collapsed: false });
   closeAddModal();
   render();
 });
@@ -793,7 +840,7 @@ document.getElementById('addModalConfirm').addEventListener('click', () => {
   const name = tokenInput.value.trim();
   if (!name) { tokenInput.focus(); return; }
   haptic(8);
-  state.custom.push({ name, tag: 'Custom', ready: 0, sick: 0, atk: modalAtk, def: modalDef, collapsed: false });
+  state.custom.push({ name, tag: 'Custom', ready: 0, sick: 0, hasted: 0, hasteMode: false, atk: modalAtk, def: modalDef, collapsed: false });
   closeAddModal();
   render();
 });
@@ -808,7 +855,10 @@ tokenInput.addEventListener('keydown', e => {
    ============================================================ */
 const resetModal = document.getElementById('resetModal');
 
-document.getElementById('resetBtn').addEventListener('click', () => resetModal.classList.add('open'));
+document.getElementById('menuNewGame').addEventListener('click', () => {
+  closeHamburger();
+  resetModal.classList.add('open');
+});
 document.getElementById('resetModalCancel').addEventListener('click', () => resetModal.classList.remove('open'));
 resetModal.addEventListener('click', e => { if (e.target === resetModal) resetModal.classList.remove('open'); });
 

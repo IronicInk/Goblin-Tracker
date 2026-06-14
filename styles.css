@@ -120,20 +120,9 @@ body {
   margin-top: 2px;
 }
 
-.btn-reset {
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--orange);
-  border: 1px solid rgba(240, 112, 48, 0.4);
-  border-radius: var(--radius-pill);
-  padding: 8px 18px;
-  background: var(--orange-dim);
-  transition: background 0.15s, border-color 0.15s;
-}
-.btn-reset:hover  { background: rgba(240, 112, 48, 0.28); border-color: var(--orange); }
-.btn-reset:active { background: rgba(240, 112, 48, 0.12); }
+/* Danger item in hamburger menu (New Game) */
+.hamburger-menu__item--danger { color: var(--red); }
+.hamburger-menu__item--danger:hover { background: var(--red-dim); }
 
 /* === SECTIONS === */
 .section {
@@ -614,6 +603,9 @@ body {
 .token-card .goblin-pt-section .stepper { width: 100%; }
 .token-card .goblin-stat-val { font-size: 26px; padding: 8px 0; }
 .token-card .goblin-pt-sep { font-size: 22px; padding-top: 0; align-self: center; }
+
+/* Token card haste toggle — no bottom border-radius, card clips it */
+.token-haste-toggle { border-radius: 0; }
 
 /* Remove button row */
 .token-card-remove {
