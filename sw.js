@@ -1,4 +1,4 @@
-const CACHE = 'mythicaltrack-v5';
+const CACHE = 'mythicaltrack-v6';
 const ASSETS = [
   './',
   './index.html',
