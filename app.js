@@ -13,7 +13,47 @@ if ('serviceWorker' in navigator) {
    HAPTIC FEEDBACK
    ============================================================ */
 function haptic(ms = 6) {
+  if (!state.hapticEnabled) return;
   try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {}
+}
+
+/* ============================================================
+   UNDO
+   ============================================================ */
+let undoSnapshot = null;
+
+function saveUndoSnapshot() {
+  undoSnapshot = {
+    goblinsReady:  state.goblinsReady,
+    goblinsSick:   state.goblinsSick,
+    goblinsHasted: state.goblinsHasted,
+    goblinAtk:     state.goblinAtk,
+    goblinDef:     state.goblinDef,
+    hasteMode:     state.hasteMode,
+    turn:          state.turn,
+    custom:        JSON.parse(JSON.stringify(state.custom)),
+  };
+  updateUndoBtn();
+}
+
+function updateUndoBtn() {
+  const btn = document.getElementById('menuUndo');
+  if (btn) btn.disabled = !undoSnapshot;
+}
+
+function applyUndo() {
+  if (!undoSnapshot) return;
+  state.goblinsReady  = undoSnapshot.goblinsReady;
+  state.goblinsSick   = undoSnapshot.goblinsSick;
+  state.goblinsHasted = undoSnapshot.goblinsHasted;
+  state.goblinAtk     = undoSnapshot.goblinAtk;
+  state.goblinDef     = undoSnapshot.goblinDef;
+  state.hasteMode     = undoSnapshot.hasteMode;
+  state.turn          = undoSnapshot.turn;
+  state.custom        = undoSnapshot.custom;
+  undoSnapshot        = null;
+  updateUndoBtn();
+  render();
 }
 
 /* ============================================================
@@ -130,6 +170,8 @@ const state = {
   goblinAtk: 1,
   goblinDef: 1,
   hasteMode: false,
+  turn: 1,
+  hapticEnabled: true,
   custom: [],
   commanderStates: {},
 };
@@ -149,19 +191,21 @@ function loadState() {
     if (typeof saved.goblinsHasted  === 'number') state.goblinsHasted  = saved.goblinsHasted;
     if (typeof saved.goblinAtk    === 'number') state.goblinAtk    = saved.goblinAtk;
     if (typeof saved.goblinDef    === 'number') state.goblinDef    = saved.goblinDef;
-    if (typeof saved.hasteMode    === 'boolean') state.hasteMode   = saved.hasteMode;
+    if (typeof saved.hasteMode      === 'boolean') state.hasteMode      = saved.hasteMode;
+    if (typeof saved.turn           === 'number')  state.turn           = saved.turn;
+    if (typeof saved.hapticEnabled  === 'boolean') state.hapticEnabled  = saved.hapticEnabled;
     if (saved.commanderStates && typeof saved.commanderStates === 'object') {
       state.commanderStates = saved.commanderStates;
     }
     if (Array.isArray(saved.custom)) {
-      // Migrate old `count` field to ready/sick shape
       state.custom = saved.custom.map(t => ({
-        name:  t.name  || 'Token',
-        tag:   t.tag   || 'Token',
-        ready: typeof t.ready === 'number' ? t.ready : (t.count || 0),
-        sick:  typeof t.sick  === 'number' ? t.sick  : 0,
-        atk:   typeof t.atk   === 'number' ? t.atk   : 1,
-        def:   typeof t.def   === 'number' ? t.def   : 1,
+        name:      t.name      || 'Token',
+        tag:       t.tag       || 'Token',
+        ready:     typeof t.ready     === 'number'  ? t.ready     : (t.count || 0),
+        sick:      typeof t.sick      === 'number'  ? t.sick      : 0,
+        atk:       typeof t.atk      === 'number'  ? t.atk       : 1,
+        def:       typeof t.def      === 'number'  ? t.def       : 1,
+        collapsed: typeof t.collapsed === 'boolean' ? t.collapsed : false,
       }));
     }
   } catch (e) {}
@@ -318,6 +362,7 @@ function startGame(cmd) {
       goblinAtk:     state.goblinAtk,
       goblinDef:     state.goblinDef,
       hasteMode:     state.hasteMode,
+      turn:          state.turn,
       custom:        state.custom,
     };
 
@@ -330,6 +375,7 @@ function startGame(cmd) {
       state.goblinAtk     = prev.goblinAtk;
       state.goblinDef     = prev.goblinDef;
       state.hasteMode     = prev.hasteMode;
+      state.turn          = prev.turn || 1;
       state.custom        = prev.custom;
     } else {
       state.goblinsReady  = 0;
@@ -338,8 +384,11 @@ function startGame(cmd) {
       state.goblinAtk     = 1;
       state.goblinDef     = 1;
       state.hasteMode     = false;
+      state.turn          = 1;
       state.custom        = [];
     }
+    undoSnapshot = null;
+    updateUndoBtn();
   }
 
   state.commander = cmd;
@@ -365,8 +414,20 @@ function render() {
   renderGoblins();
   renderTokens();
   renderHasteToggle();
+  renderTurnChip();
+  renderHapticToggle();
   appEl.classList.toggle('no-tokens', state.custom.length === 0);
   saveState();
+}
+
+function renderTurnChip() {
+  const el = document.getElementById('turnChip');
+  if (el) el.textContent = `Turn ${state.turn}`;
+}
+
+function renderHapticToggle() {
+  const btn = document.getElementById('hapticSettingToggle');
+  if (btn) btn.setAttribute('aria-pressed', String(state.hapticEnabled));
 }
 
 function renderGoblins() {
@@ -398,59 +459,67 @@ function renderGoblins() {
 }
 
 function tokenCardHTML(t, idxAttr, removeIdx) {
-  const tagClass = (t.tag || 'token').toLowerCase();
-  const total    = t.ready + t.sick;
+  const tagClass  = (t.tag || 'token').toLowerCase();
+  const total     = t.ready + t.sick;
+  const collapsed = t.collapsed || false;
   return `
-    <div class="token-card">
-      <div class="token-card-header">
+    <div class="token-card ${collapsed ? 'token-card--collapsed' : ''}">
+      <div class="token-card-header" data-collapse-ci="${removeIdx}">
         <span class="token-name">${t.name}</span>
-        <span class="token-tag ${tagClass}">${t.tag}</span>
+        <div class="token-header-right">
+          ${collapsed ? `<span class="token-collapsed-total">${total}</span>` : ''}
+          <span class="token-tag ${tagClass}">${t.tag}</span>
+          <button class="btn-collapse" data-collapse-ci="${removeIdx}" aria-label="${collapsed ? 'Expand' : 'Collapse'} ${t.name}">${collapsed ? '›' : '‹'}</button>
+        </div>
       </div>
-      <div class="token-card-body">
-        <div class="token-stats">
-          <div class="stat-block">
-            <span class="stat-label">⚔ Attack</span>
+      ${collapsed ? '' : `
+      <div class="goblin-total-row">
+        <span class="pool-total-label">Total</span>
+        <span class="pool-total-val">${total}</span>
+      </div>
+      <div class="goblin-pools">
+        <div class="goblin-pool">
+          <span class="pool-label">Ready</span>
+          <div class="stepper">
+            <button class="stepper-btn" ${idxAttr} data-pool="ready" data-d="1" aria-label="Add ready">+</button>
+            <span class="goblin-count">${t.ready}</span>
+            <button class="stepper-btn" ${idxAttr} data-pool="ready" data-d="-1" aria-label="Remove ready">−</button>
+          </div>
+        </div>
+        <div class="goblin-pool">
+          <span class="pool-label">Sick</span>
+          <div class="stepper">
+            <button class="stepper-btn" ${idxAttr} data-pool="sick" data-d="1" aria-label="Add sick">+</button>
+            <span class="goblin-count">${t.sick}</span>
+            <button class="stepper-btn" ${idxAttr} data-pool="sick" data-d="-1" aria-label="Remove sick">−</button>
+          </div>
+        </div>
+      </div>
+      <div class="goblin-pt-section">
+        <div class="goblin-pt-grid">
+          <div class="goblin-pool">
+            <span class="pool-label">⚔ Attack</span>
             <div class="stepper">
-              <button class="stat-btn stepper-btn" ${idxAttr} data-stat="atk" data-d="1" aria-label="Increase attack">+</button>
-              <span class="stat-value">${t.atk}</span>
-              <button class="stat-btn stepper-btn" ${idxAttr} data-stat="atk" data-d="-1" aria-label="Decrease attack">−</button>
+              <button class="stepper-btn" ${idxAttr} data-stat="atk" data-d="1" aria-label="Increase attack">+</button>
+              <span class="goblin-stat-val">${t.atk}</span>
+              <button class="stepper-btn" ${idxAttr} data-stat="atk" data-d="-1" aria-label="Decrease attack">−</button>
             </div>
           </div>
-          <div class="stat-divider">/</div>
-          <div class="stat-block">
-            <span class="stat-label">🛡 Defense</span>
+          <span class="goblin-pt-sep">/</span>
+          <div class="goblin-pool">
+            <span class="pool-label">🛡 Defense</span>
             <div class="stepper">
-              <button class="stat-btn stepper-btn" ${idxAttr} data-stat="def" data-d="1" aria-label="Increase defense">+</button>
-              <span class="stat-value">${t.def}</span>
-              <button class="stat-btn stepper-btn" ${idxAttr} data-stat="def" data-d="-1" aria-label="Decrease defense">−</button>
+              <button class="stepper-btn" ${idxAttr} data-stat="def" data-d="1" aria-label="Increase defense">+</button>
+              <span class="goblin-stat-val">${t.def}</span>
+              <button class="stepper-btn" ${idxAttr} data-stat="def" data-d="-1" aria-label="Decrease defense">−</button>
             </div>
           </div>
         </div>
       </div>
-      <div class="token-card-footer">
-        <div class="token-footer-top">
-          <span class="token-total-label">Total: <span class="token-total-num">${total}</span></span>
-          <button class="btn-remove" data-ri="${removeIdx}" aria-label="Remove ${t.name} token">×</button>
-        </div>
-        <div class="token-pools">
-          <div class="token-pool token-pool--ready">
-            <span class="token-pool__label">Ready</span>
-            <div class="stepper">
-              <button class="stepper-btn" ${idxAttr} data-pool="ready" data-d="1" aria-label="Add ready">+</button>
-              <span class="token-pool__count">${t.ready}</span>
-              <button class="stepper-btn" ${idxAttr} data-pool="ready" data-d="-1" aria-label="Remove ready">−</button>
-            </div>
-          </div>
-          <div class="token-pool token-pool--sick">
-            <span class="token-pool__label">Sick</span>
-            <div class="stepper">
-              <button class="stepper-btn" ${idxAttr} data-pool="sick" data-d="1" aria-label="Add sick">+</button>
-              <span class="token-pool__count">${t.sick}</span>
-              <button class="stepper-btn" ${idxAttr} data-pool="sick" data-d="-1" aria-label="Remove sick">−</button>
-            </div>
-          </div>
-        </div>
+      <div class="token-card-remove">
+        <button class="btn-remove" data-ri="${removeIdx}" aria-label="Remove ${t.name} token">× Remove</button>
       </div>
+      `}
     </div>`;
 }
 
@@ -548,6 +617,7 @@ wipeModal.addEventListener('click', e => {
 });
 
 document.getElementById('wipeModalConfirm').addEventListener('click', () => {
+  saveUndoSnapshot();
   haptic(25);
   state.goblinsReady  = 0;
   state.goblinsSick   = 0;
@@ -571,6 +641,7 @@ function renderHasteToggle() {
 }
 
 hasteToggleBtn.addEventListener('click', () => {
+  saveUndoSnapshot();
   haptic(6);
   const wasOn = state.hasteMode;
   state.hasteMode = !state.hasteMode;
@@ -588,7 +659,9 @@ hasteToggleBtn.addEventListener('click', () => {
    Graduates Sick → Ready on the main pool AND all token cards.
    ============================================================ */
 document.getElementById('newTurnBtn').addEventListener('click', () => {
+  saveUndoSnapshot();
   haptic(12);
+  state.turn++;
   state.goblinsReady  += state.goblinsSick + state.goblinsHasted;
   state.goblinsSick    = 0;
   state.goblinsHasted  = 0;
@@ -607,6 +680,7 @@ document.getElementById('newTurnBtn').addEventListener('click', () => {
 document.getElementById('tapKrenkoBtn').addEventListener('click', () => {
   const total = goblinTotal();
   if (total === 0) return;
+  saveUndoSnapshot();
   haptic(15);
   const { tapType, tapCount } = state.commander;
   const pool = state.hasteMode ? 'goblinsHasted' : 'goblinsSick';
@@ -652,8 +726,18 @@ document.getElementById('tokensGrid').addEventListener('click', e => {
   // Remove button
   const rBtn = e.target.closest('[data-ri]');
   if (rBtn) {
+    saveUndoSnapshot();
     haptic(10);
     state.custom.splice(+rBtn.dataset.ri, 1);
+    render();
+    return;
+  }
+
+  // Collapse/expand toggle
+  const colBtn = e.target.closest('[data-collapse-ci]');
+  if (colBtn) {
+    const idx = +colBtn.dataset.collapseCi;
+    state.custom[idx].collapsed = !state.custom[idx].collapsed;
     render();
   }
 });
@@ -695,7 +779,7 @@ document.getElementById('presetTokenGrid').addEventListener('click', e => {
   const chip = e.target.closest('.preset-chip');
   if (!chip) return;
   haptic(8);
-  state.custom.push({ name: chip.dataset.name, tag: 'Token', ready: 0, sick: 0, atk: +chip.dataset.atk, def: +chip.dataset.def });
+  state.custom.push({ name: chip.dataset.name, tag: 'Token', ready: 0, sick: 0, atk: +chip.dataset.atk, def: +chip.dataset.def, collapsed: false });
   closeAddModal();
   render();
 });
@@ -709,7 +793,7 @@ document.getElementById('addModalConfirm').addEventListener('click', () => {
   const name = tokenInput.value.trim();
   if (!name) { tokenInput.focus(); return; }
   haptic(8);
-  state.custom.push({ name, tag: 'Custom', ready: 0, sick: 0, atk: modalAtk, def: modalDef });
+  state.custom.push({ name, tag: 'Custom', ready: 0, sick: 0, atk: modalAtk, def: modalDef, collapsed: false });
   closeAddModal();
   render();
 });
@@ -730,18 +814,19 @@ resetModal.addEventListener('click', e => { if (e.target === resetModal) resetMo
 
 document.getElementById('resetModalConfirm').addEventListener('click', () => {
   haptic(20);
-  state.commander      = null;
   state.goblinsReady   = 0;
   state.goblinsSick    = 0;
   state.goblinsHasted  = 0;
   state.goblinAtk      = 1;
   state.goblinDef      = 1;
   state.hasteMode      = false;
+  state.turn           = 1;
   state.custom         = [];
-  state.commanderStates = {};
+  undoSnapshot = null;
+  // Remove this commander's saved state so the select screen shows No Game
+  if (state.commander) delete state.commanderStates[state.commander.id];
   resetModal.classList.remove('open');
-  saveState();
-  goToSelectScreen();
+  render();
 });
 
 /* ============================================================
@@ -787,6 +872,49 @@ document.addEventListener('click', closeHamburger);
 document.getElementById('menuTutorial').addEventListener('click', () => {
   closeHamburger();
   openTutorial();
+});
+
+document.getElementById('menuUndo').addEventListener('click', () => {
+  closeHamburger();
+  applyUndo();
+});
+
+const clearCmdModal = document.getElementById('clearCmdModal');
+
+document.getElementById('menuClearCommander').addEventListener('click', () => {
+  closeHamburger();
+  clearCmdModal.classList.add('open');
+});
+
+document.getElementById('clearCmdCancel').addEventListener('click', () => {
+  clearCmdModal.classList.remove('open');
+});
+
+clearCmdModal.addEventListener('click', e => {
+  if (e.target === clearCmdModal) clearCmdModal.classList.remove('open');
+});
+
+document.getElementById('clearCmdConfirm').addEventListener('click', () => {
+  saveUndoSnapshot();
+  haptic(20);
+  state.goblinsReady   = 0;
+  state.goblinsSick    = 0;
+  state.goblinsHasted  = 0;
+  state.goblinAtk      = 1;
+  state.goblinDef      = 1;
+  state.hasteMode      = false;
+  state.custom         = [];
+  // turn intentionally preserved — game continues
+  clearCmdModal.classList.remove('open');
+  render();
+});
+
+document.getElementById('hapticSettingToggle').addEventListener('click', e => {
+  e.stopPropagation();
+  state.hapticEnabled = !state.hapticEnabled;
+  haptic(6);
+  renderHapticToggle();
+  saveState();
 });
 
 /* ============================================================

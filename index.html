@@ -118,6 +118,7 @@
     <div class="app-header__left">
       <button class="btn-change-cmd" id="changeCommanderBtn" aria-label="Change commander">‹ Commander</button>
     </div>
+    <span class="turn-chip" id="turnChip">Turn 1</span>
     <div class="app-header__right">
       <button class="btn-reset" id="resetBtn" aria-label="Start new game">New Game</button>
       <button class="btn-hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
@@ -128,6 +129,22 @@
     </div>
     <!-- Dropdown menu -->
     <div class="hamburger-menu" id="hamburgerMenu" hidden role="menu">
+      <button class="hamburger-menu__item" id="menuUndo" role="menuitem" disabled>
+        <span class="hamburger-menu__icon">↩</span>
+        Undo
+      </button>
+      <div class="hamburger-menu__divider"></div>
+      <button class="hamburger-menu__item" id="menuClearCommander" role="menuitem">
+        <span class="hamburger-menu__icon">🗑</span>
+        Clear Board
+      </button>
+      <div class="hamburger-menu__divider"></div>
+      <div class="hamburger-menu__item hamburger-menu__setting" role="menuitem">
+        <span class="hamburger-menu__icon">📳</span>
+        <span class="hamburger-menu__setting-label">Haptics</span>
+        <button class="menu-toggle" id="hapticSettingToggle" aria-pressed="true" aria-label="Toggle haptic feedback"></button>
+      </div>
+      <div class="hamburger-menu__divider"></div>
       <button class="hamburger-menu__item" id="menuTutorial" role="menuitem">
         <span class="hamburger-menu__icon">📖</span>
         Tutorial
@@ -262,6 +279,18 @@
           <strong>New Turn</strong> — Moves all Sick tokens to Ready so they can fight
         </div>
       </div>
+      <div class="onboard-step">
+        <span class="onboard-step-dot" style="background: var(--text-dim)"></span>
+        <div class="onboard-step-text">
+          <strong>New Game</strong> — Resets this commander's board and turn counter. Other commanders' games are saved and unaffected
+        </div>
+      </div>
+      <div class="onboard-step">
+        <span class="onboard-step-dot" style="background: var(--red)"></span>
+        <div class="onboard-step-text">
+          <strong>Clear Board</strong> — Wipes all tokens mid-game but keeps the turn counter running. Found in the menu (&#8943;)
+        </div>
+      </div>
     </div>
     <button class="btn-modal btn-modal--confirm" id="onboardDone" style="width:100%; margin-top:8px;">Let's Play!</button>
   </div>
@@ -355,11 +384,25 @@
      ============================================================ -->
 <div class="modal-overlay" id="resetModal" role="dialog" aria-modal="true" aria-labelledby="resetModalTitle">
   <div class="modal">
-    <h3 class="modal-title" id="resetModalTitle">Start New Game?</h3>
-    <p class="modal-body">This will reset all tokens and return you to commander selection.</p>
+    <h3 class="modal-title" id="resetModalTitle">New Game?</h3>
+    <p class="modal-body">Resets this commander's tokens and turn counter. Other commanders' games are unaffected.</p>
     <div class="modal-actions">
       <button class="btn-modal btn-modal--cancel" id="resetModalCancel">Cancel</button>
-      <button class="btn-modal btn-modal--danger" id="resetModalConfirm">Reset Everything</button>
+      <button class="btn-modal btn-modal--danger" id="resetModalConfirm">New Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     CLEAR COMMANDER MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="clearCmdModal" role="dialog" aria-modal="true" aria-labelledby="clearCmdTitle">
+  <div class="modal">
+    <h3 class="modal-title" id="clearCmdTitle">Clear Board?</h3>
+    <p class="modal-body">Removes all tokens from this commander's board. The game and turn counter continue.</p>
+    <div class="modal-actions">
+      <button class="btn-modal btn-modal--cancel" id="clearCmdCancel">Cancel</button>
+      <button class="btn-modal btn-modal--danger" id="clearCmdConfirm">Clear Board</button>
     </div>
   </div>
 </div>
