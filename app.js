@@ -207,12 +207,27 @@ function applyCommanderTheme(cmd) {
 /* ============================================================
    COMMANDER SELECTION SCREEN
    ============================================================ */
+function commanderIsActive(cmdId) {
+  if (state.commander && state.commander.id === cmdId) {
+    return state.goblinsReady > 0 || state.goblinsSick > 0 ||
+           state.goblinsHasted > 0 || state.custom.length > 0;
+  }
+  const saved = state.commanderStates[cmdId];
+  if (!saved) return false;
+  return saved.goblinsReady > 0 || saved.goblinsSick > 0 ||
+         saved.goblinsHasted > 0 || (Array.isArray(saved.custom) && saved.custom.length > 0);
+}
+
 function renderCommanderGrid() {
   const grid = document.getElementById('commanderGrid');
   grid.innerHTML = COMMANDERS.map(cmd => {
     const pips = cmd.pips.map(p =>
       `<span class="pip" style="background:${PIP_COLORS[p] || '#888'}" title="${p}"></span>`
     ).join('');
+    const active = commanderIsActive(cmd.id);
+    const statusChip = active
+      ? `<span class="cmd-status cmd-status--active">● In Progress</span>`
+      : `<span class="cmd-status cmd-status--idle">No Game</span>`;
     return `
       <div class="cmd-card" data-cmd-id="${cmd.id}" role="listitem" tabindex="0"
            style="--accent-color:${cmd.accent}; --accent-dim:${cmd.accentDim}"
@@ -227,7 +242,10 @@ function renderCommanderGrid() {
           <p class="cmd-card__ability">${cmd.ability}</p>
           <div class="cmd-card__footer">
             <span class="cmd-card__token">Token: ${cmd.tokenName}</span>
-            <div class="cmd-card__pips">${pips}</div>
+            <div class="cmd-card__footer-right">
+              ${statusChip}
+              <div class="cmd-card__pips">${pips}</div>
+            </div>
           </div>
         </div>
         <div class="cmd-card__arrow">›</div>

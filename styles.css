@@ -1356,6 +1356,34 @@ body {
   margin-top: 8px;
 }
 
+.cmd-card__footer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Commander status chip */
+.cmd-status {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+.cmd-status--active {
+  background: rgba(240, 176, 48, 0.15);
+  color: var(--haste);
+  border: 1px solid rgba(240, 176, 48, 0.3);
+}
+.cmd-status--idle {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
 .cmd-card__token {
   font-family: 'Inter', sans-serif;
   font-size: 12px;
