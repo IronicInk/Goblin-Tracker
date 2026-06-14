@@ -131,6 +131,7 @@ const state = {
   goblinDef: 1,
   hasteMode: false,
   custom: [],
+  commanderStates: {},
 };
 
 function saveState() {
@@ -149,6 +150,9 @@ function loadState() {
     if (typeof saved.goblinAtk    === 'number') state.goblinAtk    = saved.goblinAtk;
     if (typeof saved.goblinDef    === 'number') state.goblinDef    = saved.goblinDef;
     if (typeof saved.hasteMode    === 'boolean') state.hasteMode   = saved.hasteMode;
+    if (saved.commanderStates && typeof saved.commanderStates === 'object') {
+      state.commanderStates = saved.commanderStates;
+    }
     if (Array.isArray(saved.custom)) {
       // Migrate old `count` field to ready/sick shape
       state.custom = saved.custom.map(t => ({
@@ -285,6 +289,41 @@ document.getElementById('customCmdConfirm').addEventListener('click', () => {
    START GAME
    ============================================================ */
 function startGame(cmd) {
+  const isSwitch = state.commander && state.commander.id !== cmd.id;
+
+  if (isSwitch) {
+    // Save outgoing commander's state
+    state.commanderStates[state.commander.id] = {
+      goblinsReady:  state.goblinsReady,
+      goblinsSick:   state.goblinsSick,
+      goblinsHasted: state.goblinsHasted,
+      goblinAtk:     state.goblinAtk,
+      goblinDef:     state.goblinDef,
+      hasteMode:     state.hasteMode,
+      custom:        state.custom,
+    };
+
+    // Load incoming commander's state, or start fresh
+    const prev = state.commanderStates[cmd.id];
+    if (prev) {
+      state.goblinsReady  = prev.goblinsReady;
+      state.goblinsSick   = prev.goblinsSick;
+      state.goblinsHasted = prev.goblinsHasted;
+      state.goblinAtk     = prev.goblinAtk;
+      state.goblinDef     = prev.goblinDef;
+      state.hasteMode     = prev.hasteMode;
+      state.custom        = prev.custom;
+    } else {
+      state.goblinsReady  = 0;
+      state.goblinsSick   = 0;
+      state.goblinsHasted = 0;
+      state.goblinAtk     = 1;
+      state.goblinDef     = 1;
+      state.hasteMode     = false;
+      state.custom        = [];
+    }
+  }
+
   state.commander = cmd;
   applyCommanderTheme(cmd);
   showScreen('game');
@@ -673,14 +712,15 @@ resetModal.addEventListener('click', e => { if (e.target === resetModal) resetMo
 
 document.getElementById('resetModalConfirm').addEventListener('click', () => {
   haptic(20);
-  state.commander     = null;
-  state.goblinsReady  = 0;
-  state.goblinsSick   = 0;
-  state.goblinsHasted = 0;
-  state.goblinAtk     = 1;
-  state.goblinDef     = 1;
-  state.hasteMode     = false;
-  state.custom        = [];
+  state.commander      = null;
+  state.goblinsReady   = 0;
+  state.goblinsSick    = 0;
+  state.goblinsHasted  = 0;
+  state.goblinAtk      = 1;
+  state.goblinDef      = 1;
+  state.hasteMode      = false;
+  state.custom         = [];
+  state.commanderStates = {};
   resetModal.classList.remove('open');
   saveState();
   goToSelectScreen();
