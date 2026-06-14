@@ -151,8 +151,8 @@
         <span class="pool-total-val" id="goblinTotal">0</span>
       </div>
 
-      <div class="goblin-pools">
-        <div class="goblin-pool">
+      <div class="goblin-pools" id="goblinPools">
+        <div class="goblin-pool goblin-pool--ready">
           <span class="pool-label">Ready</span>
           <div class="stepper">
             <button class="stepper-btn" id="readyPlus" aria-label="Add ready token">+</button>
@@ -160,7 +160,15 @@
             <button class="stepper-btn" id="readyMinus" aria-label="Remove ready token">−</button>
           </div>
         </div>
-        <div class="goblin-pool">
+        <div class="goblin-pool goblin-pool--hasted" id="hastedPool">
+          <span class="pool-label">⚡ Hasted</span>
+          <div class="stepper">
+            <button class="stepper-btn" id="hastedPlus" aria-label="Add hasted token">+</button>
+            <span class="goblin-count" id="goblinsHasted">0</span>
+            <button class="stepper-btn" id="hastedMinus" aria-label="Remove hasted token">−</button>
+          </div>
+        </div>
+        <div class="goblin-pool goblin-pool--sick">
           <span class="pool-label">Sick</span>
           <div class="stepper">
             <button class="stepper-btn" id="sickPlus" aria-label="Add sick token">+</button>

@@ -126,6 +126,7 @@ const state = {
   commander: null,
   goblinsReady: 0,
   goblinsSick: 0,
+  goblinsHasted: 0,
   goblinAtk: 1,
   goblinDef: 1,
   hasteMode: false,
@@ -142,8 +143,9 @@ function loadState() {
     if (!raw) return;
     const saved = JSON.parse(raw);
     if (saved.commander?.id)                state.commander    = saved.commander;
-    if (typeof saved.goblinsReady === 'number') state.goblinsReady = saved.goblinsReady;
-    if (typeof saved.goblinsSick  === 'number') state.goblinsSick  = saved.goblinsSick;
+    if (typeof saved.goblinsReady   === 'number') state.goblinsReady   = saved.goblinsReady;
+    if (typeof saved.goblinsSick    === 'number') state.goblinsSick    = saved.goblinsSick;
+    if (typeof saved.goblinsHasted  === 'number') state.goblinsHasted  = saved.goblinsHasted;
     if (typeof saved.goblinAtk    === 'number') state.goblinAtk    = saved.goblinAtk;
     if (typeof saved.goblinDef    === 'number') state.goblinDef    = saved.goblinDef;
     if (typeof saved.hasteMode    === 'boolean') state.hasteMode   = saved.hasteMode;
@@ -165,7 +167,7 @@ function loadState() {
    HELPERS
    ============================================================ */
 function goblinTotal() {
-  return state.goblinsReady + state.goblinsSick;
+  return state.goblinsReady + state.goblinsSick + state.goblinsHasted;
 }
 
 function darken(hex) {
@@ -314,8 +316,9 @@ function renderGoblins() {
   const total = goblinTotal();
   const cmd   = state.commander;
 
-  document.getElementById('goblinsReady').textContent = state.goblinsReady;
-  document.getElementById('goblinsSick').textContent  = state.goblinsSick;
+  document.getElementById('goblinsReady').textContent  = state.goblinsReady;
+  document.getElementById('goblinsHasted').textContent = state.goblinsHasted;
+  document.getElementById('goblinsSick').textContent   = state.goblinsSick;
   document.getElementById('goblinTotal').textContent  = total;
   document.getElementById('goblinAtk').textContent    = state.goblinAtk;
   document.getElementById('goblinDef').textContent    = state.goblinDef;
@@ -411,6 +414,17 @@ document.getElementById('readyPlus').addEventListener('click', () => {
   state.goblinsReady++;
   render();
 });
+document.getElementById('hastedMinus').addEventListener('click', () => {
+  haptic(6);
+  if (state.goblinsHasted === 0) return;
+  state.goblinsHasted--;
+  render();
+});
+document.getElementById('hastedPlus').addEventListener('click', () => {
+  haptic(6);
+  state.goblinsHasted++;
+  render();
+});
 document.getElementById('sickMinus').addEventListener('click', () => {
   haptic(6);
   if (state.goblinsSick === 0) return;
@@ -468,8 +482,9 @@ wipeModal.addEventListener('click', e => {
 
 document.getElementById('wipeModalConfirm').addEventListener('click', () => {
   haptic(25);
-  state.goblinsReady = 0;
-  state.goblinsSick  = 0;
+  state.goblinsReady  = 0;
+  state.goblinsSick   = 0;
+  state.goblinsHasted = 0;
   wipeModal.classList.remove('open');
   render();
 });
@@ -484,14 +499,20 @@ const hasteToggleBtn = document.getElementById('hasteToggle');
 function renderHasteToggle() {
   const on = state.hasteMode;
   hasteToggleBtn.setAttribute('aria-pressed', String(on));
-  document.getElementById('hasteTarget').textContent = on ? 'Ready' : 'Sick';
+  document.getElementById('hasteTarget').textContent = on ? '⚡ Hasted' : 'Sick';
+  document.getElementById('goblinPools').classList.toggle('goblin-pools--haste', on);
 }
 
 hasteToggleBtn.addEventListener('click', () => {
   haptic(6);
+  const wasOn = state.hasteMode;
   state.hasteMode = !state.hasteMode;
-  renderHasteToggle();
-  saveState();
+  if (wasOn) {
+    // Turning haste OFF — hasted tokens lose haste, fall back to sick
+    state.goblinsSick += state.goblinsHasted;
+    state.goblinsHasted = 0;
+  }
+  render();
 });
 
 /* ============================================================
@@ -500,8 +521,9 @@ hasteToggleBtn.addEventListener('click', () => {
    ============================================================ */
 document.getElementById('newTurnBtn').addEventListener('click', () => {
   haptic(12);
-  state.goblinsReady += state.goblinsSick;
-  state.goblinsSick   = 0;
+  state.goblinsReady  += state.goblinsSick + state.goblinsHasted;
+  state.goblinsSick    = 0;
+  state.goblinsHasted  = 0;
   // Graduate all token card sick pools too
   state.custom.forEach(t => {
     t.ready += t.sick;
@@ -519,13 +541,13 @@ document.getElementById('tapKrenkoBtn').addEventListener('click', () => {
   if (total === 0) return;
   haptic(15);
   const { tapType, tapCount } = state.commander;
-  const pool = state.hasteMode ? 'goblinsReady' : 'goblinsSick';
+  const pool = state.hasteMode ? 'goblinsHasted' : 'goblinsSick';
   const tokenPool = state.hasteMode ? 'ready' : 'sick';
 
   if (tapType === 'x-total') {
     state[pool] += total;
   } else if (tapType === 'double') {
-    state[pool] += state.goblinsReady + state.goblinsSick;
+    state[pool] += state.goblinsReady + state.goblinsSick + state.goblinsHasted;
     state.custom.forEach(t => { t[tokenPool] += t.ready + t.sick; });
   } else {
     state[pool] += tapCount || 1;
@@ -640,13 +662,14 @@ resetModal.addEventListener('click', e => { if (e.target === resetModal) resetMo
 
 document.getElementById('resetModalConfirm').addEventListener('click', () => {
   haptic(20);
-  state.commander    = null;
-  state.goblinsReady = 0;
-  state.goblinsSick  = 0;
-  state.goblinAtk    = 1;
-  state.goblinDef    = 1;
-  state.hasteMode    = false;
-  state.custom       = [];
+  state.commander     = null;
+  state.goblinsReady  = 0;
+  state.goblinsSick   = 0;
+  state.goblinsHasted = 0;
+  state.goblinAtk     = 1;
+  state.goblinDef     = 1;
+  state.hasteMode     = false;
+  state.custom        = [];
   resetModal.classList.remove('open');
   saveState();
   goToSelectScreen();

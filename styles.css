@@ -21,6 +21,8 @@ ul { list-style: none; }
   --teal-dim:     rgba(0, 196, 180, 0.15);
   --red:          #e03020;
   --red-dim:      rgba(224, 48, 32, 0.15);
+  --haste:        #f0b030;
+  --haste-dim:    rgba(240, 176, 48, 0.15);
   --text:         #f0f2ff;
   --text-soft:    #6870a0;
   --text-dim:     #2e3250;
@@ -322,6 +324,37 @@ body {
 .goblin-pool:last-child .goblin-count {
   color: var(--red);
   border-color: rgba(224, 48, 32, 0.3);
+}
+
+/* 3-column grid when haste mode is active */
+.goblin-pools--haste {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* Hasted pool — hidden by default, shown in haste mode */
+.goblin-pool--hasted {
+  display: none;
+}
+.goblin-pools--haste .goblin-pool--hasted {
+  display: flex;
+}
+
+/* Hasted — amber/lightning */
+.goblin-pool--hasted .pool-label {
+  color: var(--haste);
+}
+.goblin-pool--hasted .stepper-btn {
+  color: var(--haste);
+  background: var(--haste-dim);
+  border-color: rgba(240, 176, 48, 0.3);
+}
+.goblin-pool--hasted .stepper-btn:active {
+  background: rgba(240, 176, 48, 0.28);
+  color: var(--haste);
+}
+.goblin-pool--hasted .goblin-count {
+  color: var(--haste);
+  border-color: rgba(240, 176, 48, 0.3);
 }
 
 .goblin-pool .goblin-count {
